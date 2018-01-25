@@ -1,9 +1,5 @@
 // *********************************************************
-// RTView - Samsung Artik Sample Program
-
-// MS var request = require('request');                     // HTML REQUEST
-// MS var util = require('util');
-// MS var PubNub = require("pubnub");
+// RTView - PubNub Sample Program
 
 const PubNub = require("pubnub");
 const util = require("util");
@@ -18,7 +14,7 @@ var cacheName1 = 'PubNubMarketData';
 var cacheName2 = 'PubNubWeatherData';
 var cacheName3 = 'PubNubSensorData';
 
-var debug = false;
+var debug = true;
 
 //***************************************************************
 
@@ -32,23 +28,39 @@ pubnub1 = new PubNub({
 })
 
 pubnub1.addListener({
-	message: function(message) {
-		var msg = message.message;
-		msg.time_stamp = msg.timestamp*1000;
-		if (debug) console.log(msg);
-		if (debug) console.log('... sending: ' + JSON.stringify(msg));
-		rtview_utils.send_datatable(cacheName1, msg);
-	},
-	presence: function(presenceEvent) {
-		// handle presence
-		console.log("\nPresence!!", presenceEvent);
-	}
+    message: function(message) {
+	var msg = message.message;
+	msg.time_stamp = msg.timestamp*1000;
+	if (debug) console.log(msg);
+	if (debug) console.log('... sending: ' + JSON.stringify(msg));
+	rtview_utils.send_datatable(cacheName1, msg);
+    },
+    presence: function(presenceEvent) {
+	// handle presence
+	console.log("\nPresence!!", presenceEvent);
+    }
 }) 
 
 
 pubnub1.subscribe({
 	channels: ['pubnub-market-orders'] 
 });
+
+// Specific cache definition for sample data table
+// Note: This is only called once on startup. 
+// If data server is not running, cache will not be created correctly.
+
+rtview_utils.create_datacache(cacheName1,
+{   // cache properties
+    "indexColumnNames": "symbol;trade_type",
+    "historyColumnNames": "order_quantity;bid_price"
+},[ // column metadata
+    { "time_stamp": "date" },
+    { "symbol": "string" },
+    { "trade_type": "string" },
+    { "order_quantity": "int" },
+    { "bid_price": "double" }
+]);
 
 //***************************************************************
 console.log('-----------------------------------------------------------------------');
@@ -72,6 +84,26 @@ pubnub2.addListener({
 pubnub2.subscribe({
     channels: ['pubnub-weather'] 
 });
+
+// Specific cache definition for sample data table
+// Note: This is only called once on startup. 
+// If data server is not running, cache will not be created correctly.
+
+rtview_utils.create_datacache(cacheName2,
+{   // cache properties
+    "indexColumnNames": "location;weather_station",
+    "historyColumnNames": "weather;ultraviolet_level;temp_fahrenheit;wind_direction;elevation;latitude;longitude"
+},[ // column metadata
+    { "location": "string" },
+    { "weather_station": "string" },
+    { "weather": "string" },
+    { "ultraviolet_level": "double" },
+    { "temp_fahrenheit": "double" },
+    { "wind_direction": "double" },
+    { "elevation": "string" },
+    { "latitude": "string" },
+    { "longitude": "string" }
+]);
 
 //***************************************************************
 console.log('-----------------------------------------------------------------------');
@@ -103,6 +135,23 @@ pubnub3.addListener({
 pubnub3.subscribe({
     channels: ['pubnub-sensor-network'] 
 });
+
+// Specific cache definition for sample data table
+// Note: This is only called once on startup. 
+// If data server is not running, cache will not be created correctly.
+
+rtview_utils.create_datacache(cacheName3,
+{   // cache properties
+    "indexColumnNames": "sensor_uuid",
+    "historyColumnNames": "ambient_temperature;humidity;photosensor;radiation_level;"
+},[ // column metadata
+    { "time_stamp": "date" },
+    { "sensor_uuid": "string" },
+    { "ambient_temperature": "double" },
+    { "humidity": "double" },
+    { "photosensor": "double" },
+    { "radiation_level": "double" }
+]);
 
 //***************************************************************
 console.log('-----------------------------------------------------------------------');
@@ -143,51 +192,4 @@ function pad(n, len) {
 
     return s;
 }
-
-// Specific cache definition for sample data table
-// Note: This is only called once on startup. 
-// If data server is not running, cache will not be created correctly.
-
-rtview_utils.create_datacache(cacheName1,
-{   // cache properties
-    "indexColumnNames": "symbol;trade_type",
-    "historyColumnNames": "order_quantity;bid_price"
-},[ // column metadata
-    { "time_stamp": "date" },
-    { "symbol": "string" },
-    { "trade_type": "string" },
-    { "order_quantity": "int" },
-    { "bid_price": "double" }
-]);
-
-rtview_utils.create_datacache(cacheName2,
-{   // cache properties
-    "indexColumnNames": "location;weather_station",
-    "historyColumnNames": "weather;ultraviolet_level;temp_fahrenheit;wind_direction;elevation;latitude;longitude"
-},[ // column metadata
-    { "location": "string" },
-    { "weather_station": "string" },
-    { "weather": "string" },
-    { "ultraviolet_level": "double" },
-    { "temp_fahrenheit": "double" },
-    { "wind_direction": "double" },
-    { "elevation": "string" },
-    { "latitude": "string" },
-    { "longitude": "string" }
-]);
-
-rtview_utils.create_datacache(cacheName3,
-{   // cache properties
-    "indexColumnNames": "sensor_uuid",
-    "historyColumnNames": "ambient_temperature;humidity;photosensor;radiation_level;"
-},[ // column metadata
-    { "time_stamp": "date" },
-    { "sensor_uuid": "string" },
-    { "ambient_temperature": "double" },
-    { "humidity": "double" },
-    { "photosensor": "double" },
-    { "radiation_level": "double" }
-]);
-
-
 
