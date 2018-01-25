@@ -1,0 +1,21 @@
+{
+  "name": "rtview_pubnub_feed",
+  "version": "1.0.0",
+  "description": "Node client that subscribes to PubNub demo data and pushes it to RTView Data Server",
+  "keywords": [
+    "real-time",
+    "pubnub",
+    "rtview"
+  ],
+  "homepage": "http://www.sl.com",
+
+  "main": "rtview_pubnub_feed.js",
+  "engines": [
+    "node"
+  ],
+  "dependencies": {
+    "pubnub": "",
+    "request": "",
+    "util": ""
+  }
+}
