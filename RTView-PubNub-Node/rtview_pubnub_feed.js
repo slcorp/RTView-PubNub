@@ -1,6 +1,10 @@
 // *********************************************************
 // RTView - PubNub Sample Program
 
+// This program establishes a link to a PubNub demo server,
+// subscribes to several topics, and pushes the received data
+// to an RTView DataServer for caching and persistent storage
+
 const PubNub = require("pubnub");
 const util = require("util");
 const request = require("request");
@@ -14,33 +18,31 @@ var cacheName1 = 'PubNubMarketData';
 var cacheName2 = 'PubNubWeatherData';
 var cacheName3 = 'PubNubSensorData';
 
-var debug = true;
+var debug = false;
 
 //***************************************************************
+// Market Updates
 
-console.log('-----------------------------------------------------------------------');
+console.log('----------------------------------------------------');
 console.log('Subscribing to market updates: ');
-
-//start listening for market updates
 
 pubnub1 = new PubNub({
 	subscribeKey : 'sub-c-4377ab04-f100-11e3-bffd-02ee2ddab7fe'
 })
 
 pubnub1.addListener({
+    // handle incoming message
     message: function(message) {
-	var msg = message.message;
-	msg.time_stamp = msg.timestamp*1000;
-	if (debug) console.log(msg);
-	if (debug) console.log('... sending: ' + JSON.stringify(msg));
-	rtview_utils.send_datatable(cacheName1, msg);
+        var msg = message.message;
+        msg.time_stamp = msg.timestamp * 1000;     // convert to rtview timestamp
+        if (debug) console.log(msg);
+        rtview_utils.send_datatable(cacheName1, msg);
     },
+    // handle presence
     presence: function(presenceEvent) {
-	// handle presence
-	console.log("\nPresence!!", presenceEvent);
+        console.log("\nPresence!!", presenceEvent);
     }
 }) 
-
 
 pubnub1.subscribe({
 	channels: ['pubnub-market-orders'] 
@@ -63,7 +65,9 @@ rtview_utils.create_datacache(cacheName1,
 ]);
 
 //***************************************************************
-console.log('-----------------------------------------------------------------------');
+// Weather Data
+
+console.log('----------------------------------------------------');
 console.log('Subscribing to weather feed: ');
 
 pubnub2 = new PubNub({
@@ -71,13 +75,14 @@ pubnub2 = new PubNub({
 })
 
 pubnub2.addListener({
+    // handle incoming message
     message: function(message) {
     	var msg = message.message;
     	msg.temp_fahrenheit = parseFloat(msg.temp_fahrenheit);
     	msg.ultraviolet_level = parseFloat(msg.ultraviolet_level);
     	msg.wind_direction = parseFloat(msg.wind_direction);
     	if (debug) console.log(msg);
-	rtview_utils.send_datatable(cacheName2, msg);
+        rtview_utils.send_datatable(cacheName2, msg);
     }
 }) 
 
@@ -106,35 +111,46 @@ rtview_utils.create_datacache(cacheName2,
 ]);
 
 //***************************************************************
-console.log('-----------------------------------------------------------------------');
+// Sensor Data
+
+// pubnub sensor demo assigns large random numbers to sensor uuid, so they don't repeat. 
+// Assign a new uuid so that we can accumulate history for sensor.
+
+var uuid_cntr = 0;
+
+console.log('----------------------------------------------------');
 console.log('Subscribing to pubnub sensor network: ');
 
 pubnub3 = new PubNub({
     subscribeKey : 'sub-c-5f1b7c8e-fbee-11e3-aa40-02ee2ddab7fe'
 })
 
-// pubnub sensor demo assigns large random numbers to sensor uuid, so they dont repeat. 
-// Assign a new uuid so that we can accumulate history for sensor.
-var uuid_cntr = 0;
-
 pubnub3.addListener({
+    // handle incoming message
     message: function(message) {
     	var msg = message.message;
-	msg.time_stamp = msg.timestamp*1000;
-	msg.ambient_temperature = parseFloat(msg.ambient_temperature);
-	msg.humidity = parseFloat(msg.humidity);
-	msg.photosensor = parseFloat(msg.photosensor);
-	msg.radiation_level = parseFloat(msg.radiation_level);
-	msg.sensor_uuid = "probe-"+pad(uuid_cntr++,4);
-	if (uuid_cntr > 50) uuid_cntr = 0;
-	if (debug) console.log(msg);
-	rtview_utils.send_datatable(cacheName3, msg);
+        msg.time_stamp = msg.timestamp*1000;
+        msg.ambient_temperature = parseFloat(msg.ambient_temperature);
+        msg.humidity = parseFloat(msg.humidity);
+        msg.photosensor = parseFloat(msg.photosensor);
+        msg.radiation_level = parseFloat(msg.radiation_level);
+        msg.sensor_uuid = "probe-"+pad(uuid_cntr++,4);
+        if (uuid_cntr > 50) uuid_cntr = 0;
+        if (debug) console.log(msg);
+        rtview_utils.send_datatable(cacheName3, msg);
     }
 }) 
 
 pubnub3.subscribe({
     channels: ['pubnub-sensor-network'] 
 });
+
+// Utility method to pad the sensor id name
+function pad(n, len) {
+    s = n.toString();
+    if (s.length < len) { s = ('0000000000' + s).slice(-len); }
+    return s;
+}
 
 // Specific cache definition for sample data table
 // Note: This is only called once on startup. 
@@ -154,42 +170,23 @@ rtview_utils.create_datacache(cacheName3,
 ]);
 
 //***************************************************************
+// Interval Handler
+
 console.log('-----------------------------------------------------------------------');
-// the pubnub demos stop sending data after a few minutes, so re-subscribe to
-// establish a new 'presense' and resume data flow.
+
+// the PubNub demos stop sending data after a few minutes, so re-subscribe to
+// establish a new 'presence' and resume data flow.
+
 setInterval( function() {
-	console.log('reSubscribing to pubnub-market-orders channel: ');
-	pubnub1.unsubscribe({
-		channels: ['pubnub-market-orders'] 
-	});
-	pubnub1.unsubscribe({
-		channels: ['pubnub-weather'] 
-	});
-	pubnub1.unsubscribe({
-		channels: ['pubnub-sensor-network'] 
-	});
-	
-	pubnub1.subscribe({
-		channels: ['pubnub-market-orders'] 
-	});
-	pubnub1.subscribe({
-		channels: ['pubnub-weather'] 
-	});
-	pubnub1.subscribe({
-		channels: ['pubnub-sensor-network'] 
-	});
+	console.log('... resubscribing to PubNub channels: ');
+    
+	pubnub1.unsubscribe({ channels: ['pubnub-market-orders'] });
+    pubnub1.subscribe({ channels: ['pubnub-market-orders'] });
+        
+	pubnub1.unsubscribe({ channels: ['pubnub-weather'] });
+	pubnub1.subscribe({ channels: ['pubnub-weather'] });
+    
+	pubnub1.unsubscribe({ channels: ['pubnub-sensor-network'] });
+	pubnub1.subscribe({ channels: ['pubnub-sensor-network'] });
 
 }, 120000);
-
-//----------------------------------------------------------------------
-// Utilities
-//
-function pad(n, len) {
-    s = n.toString();
-    if (s.length < len) {
-        s = ('0000000000' + s).slice(-len);
-    }
-
-    return s;
-}
-
