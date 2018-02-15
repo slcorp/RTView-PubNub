@@ -103,7 +103,7 @@ http://localhost:3270/rtvquery
 * To test the connection, click on the green magnifying glass next to the PUBNUB-IOT-SERVER.
 	This will bring up the RTView DataServer - Cache Tables dialog.
 	You should see "Connected" under Connection Status. 
-	You should also see the ClearBladeCache in the CacheTable.
+	You should also see the PubNubMarketData, PubNubWeatherData and PubNubSensorData in the CacheTable.
 	
 * Close the dialog.
 
@@ -129,59 +129,6 @@ http://localhost:3270/rtvquery
 
 	This will load the pn_market_data_raw_tables display into the editor. 
 	This display is configured to connect to your local RTView data server and collect data. This process then populates the display with live data that is being collected by the node script from PubNub.
-
-
-## External Connection
-You do not have to setup a local RTView data server to see the RTView-PubNub displays populated. 
-We have set up an instance in the Amazon cloud, dedicated to providing data for everyone. An instance of the RTView data server  and node subscriber program are already running on it. We have named this instance the iot-demo-server. The steps, below, will walk you through connecting the RTView-PubNub displays to the iot-demo-server. You will need to get a free acccount on RTViewCloud, the steps for which, are described in the "Subscription, configuration and execution of the RTViewCloud Services" section, above.
-
-### Connecting the displays to RTView's IoT data server on Amazon Cloud
-
-* On the top menu, click on Data.
-
-	This will take you to the RTData Server List page in which you will create a connection 
-	to your RTView data server.
-	
-* Click on the Add Server button. If you have already created a data server connection, named PUBNUB-IOT-SERVER in the previous section, simply edit the existing entry.
-
-* For Name, type:
-PUBNUB-IOT-SERVER
-
-* For Host/URL, type:
-http://pubnub-iot-server.slsandbox.com/rtvquery
-
-* Click on Save Added Servers.
-
-* To test the connection, click on the green magnifying glass next to the PUBNUB-IOT-SERVER.
-	This will bring up the RTView DataServer - Cache Tables dialog.
-	You should see "Connected" under Connection Status. 
-	You should also see the ClearBladeCache in the CacheTable.
-	
-* Close the dialog.
-
-* On the top menu, click on Design.
-
-	This will bring up the RTDraw, which is RTViewCloud’s visual editor.
-	
-* Click on File in the menu.
-
-* Click on Import ….
-
-* In the file browser, change directory to \rtvdemos\RTView-PubNub-Displays.
-
-* Select all displays and click Open.
-
-	This step only needs to be done once for each display.
-	
-* Click on File in the menu.
-
-* Click on Open ….
-
-* Double click on pn_market_data_raw_tables.
-
-	This will load the pn_market_data_raw_tables display into the editor. 
-	If your backend data server is active, this will connect your display to 
-	SL RTView's PubNub IoT data server that is running on an Amazon instance. 
 
 
 ## Achieved Goals
