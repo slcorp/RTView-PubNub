@@ -1,141 +1,114 @@
-**_WORK IN PROGRESS_**
-
-# RTView PubNub Demo
+# RTView PubNub Project
 
 ## Overview
-By following the steps, described below, you will be:
-* Installing and running an RTView data server on your local computer.
-* Installing and running a node script that subscribes to a few PubNub topics and pushes the data to the RTView data server.
-* Viewing preexisting displays, populated by data, coming via a servlet within RTView, through your free trial account on RTViewCloud.
+This project provides tools and examples that show how to use RTView Cloud with the PubNub Data Stream Network to readily create and deploy rich graphical displays connected to real-time and historical PubNub data. 
 
 
-### Software Requirements
-A computer with:
-* Node.js Version 6.9.0 or newer
-* A browser of your choice (e.g. Google Chrome 57.x+, MS IE 11.x+, MS Edge, or Mozilla Firefox 50.x+)
-* RTViewDataServer-Mini package (a zip file, which will be available through SL Corporation)
-* RTView-PubNub-Displays package (a directory, which is available through GitHub)
-* RTView-PubNub-Node package (a directory, which is available through GitHub)
-* A free trial subscription to RTViewCloud services
 
+By following the steps described below you will:
 
-## Installation of the packages
+* Create an account on RTView Cloud.
+* Download and run on your local computer an RTView DataServer, providing real-time data caching and historical archival.
+* Run a Node.js connector program that subscribes to a few PubNub topics and populates the RTView DataServer.
+* Import into RTView Cloud a few sample displays showing real-time data coming from PubNub.
 
-On your computer:
+## Requirements
+To run this project, you will need to have installed on your computer:
+```
+Node.js version 6 or higher
 
-* Create a directory and name it rtvdemos.
-* Download the RTViewDataServer-Mini.zip (THE DOWNLOAD LOCATION HAS NOT BEEN DEFINED, YET!)
-* Download the RTView-PubNub repository to your computer (i.e., RTView-PubNub-master.zip)
+Java version 1.7 or higher
+```
 
-### Installation and execution of the RTViewDataServer-Mini package
-Bring up a Command prompt.
+## Create an RTView Cloud account
+An RTView Cloud account provides the tools for creating, viewing and publishing rich graphical displays connected to real-time data sources.
 
-*cd rtvdemos*
+* In a browser, go to [RTView Cloud](http://rtviewcloud.sl.com/).
+* Click on Start Free Trial to create your account (skip if you have an account already).
+* Login to your RTView Cloud account.
 
-*copy \sourcePath\RTViewDataServer-Mini.zip*
-
-	Where sourcePath is the location of your download
-
-Unzip the RTViewDataServer-Mini.zip using your favorite zip/unzip utility.
-
-	This will create a directory under rtvdemos by the same name (i.e., RTViewDataServer-Mini).
-
-*cd RTViewDataServer-Mini*
-
-*start_server*
-
-	This will start the RTView data server which will work as the receiver and cache storage 
-	for the incoming data.
-
-*cd ..*
-
-
-### Installation of the RTView-PubNub-Displays package
-
-* Make sure you are in rtvdemos directory.
-* Extract the RTView-PubNub-Displays directory out of the RTView-PubNub-master.zip into rtvdemos.
-
-
-### Installation and execution of the RTView-PubNub-Node package
-
-* Make sure you are in rtvdemos directory.
-* Extract the RTView-PubNub-Node directory out of the RTView-PubNub-master.zip into rtvdemos.
-
-*cd RTView-PubNub-Node*
-
-*npm install*
-
-	This will install the necessary node packages.
-
-*node rtview_pubnub_feed*
-
-	This will start the node script which subscribes to a few PubNub topics and pushes 
-	the data into the RTView data server, which was set up in the previous section.
-
-
-### Subscription, configuration and execution of the RTViewCloud Services
-
-* In a browser, go to [RTViewCloud](http://rtviewcloud.sl.com/).
-
-* Click on Start Free Trial and follow the process to get your free trial account.
-
-* Log in to your RTViewCloud account.
-
-	Notice that you are automatically in your own private organization (e.g. JohnSPrivateOrg).
+Note that you are automatically placed into your own private organization (e.g. JohnSPrivateOrg).
 	
-### Connecting the displays to your local RTView data server
+## Download and run the RTView DataServer	
 
-* On the top menu, click on Data.
+* From your RTView Cloud account, click on the ? icon at upper right to go to the Support page.
+* Select Downloads and elect to download the RTView DataServer to your computer.
+* Unzip the downloaded **RTViewDataServer_YYYYMMDD.zip** file to a directory of your choice.
+* Open a Command Window or Linux Shell in that directory.
 
-	This will take you to the RTData Server List page in which you will create a connection 
-	to your RTView data server.
-	
-* Click on the Add Server button.
+To start the RTView DataServer:
+```
+cd RTViewDataServer
 
-* For Name, type:
-PUBNUB-IOT-SERVER
+start_server          (or ./start_server.sh in Linux)
+```
+The RTView DataServer is now ready to receive data at the following http URL:
+```
+http(s)://localhost:3270/rtvpost
+```
+At any time you can stop the server:
+```
+stop_server           (or ./stop_server.sh in Linux)
+```
+## Download and run the RTView-PubNub connector 
 
-* For Host/URL, type:
-http://localhost:3270/rtvquery
+Clone this RTView-PubNub project to your local computer and follow the steps below to install and run the RTView PubNub connector program. This simple Node.js program subscribes to public demo topics provided by PubNub and populates the RTView DataServer, which provides current and historical caching of incoming metric values for display purposes.
 
-* Click on Save Added Servers.
+To install the connector program:
+```
+cd RTView-PubNub-Node
 
-* To test the connection, click on the green magnifying glass next to the PUBNUB-IOT-SERVER.
-	This will bring up the RTView DataServer - Cache Tables dialog.
-	You should see "Connected" under Connection Status. 
-	You should also see the PubNubMarketData, PubNubWeatherData and PubNubSensorData in the CacheTable.
-	
-* Close the dialog.
+npm install
+```
+To start the program:
+```
+node rtview_pubnub_feed
+```
+This connector program can easily be modified to subscribe to topics relevant to your own application.
 
-* On the top menu, click on Design.
+## Import and view the sample RTView-PubNub displays
 
-	This will bring up the RTDraw, which is RTViewCloud’s visual editor.
-	
-* Click on File in the menu.
+* In a browser, go to [RTView Cloud](http://rtviewcloud.sl.com/).
 
-* Click on Import ….
+* Define a connection to the RTView DataServer running on your local system:
+```
+On the RTView Cloud top menu bar, select Data.
+Select the Add RTView Server button.
+In the Add RTView Server dialog enter:
 
-* In the file browser, change directory to \rtvdemos\RTView-PubNub-Displays.
+	Name:       PUBNUB-IOT-SERVER
+	Host/URL:   http://localhost:3270/rtvquery
 
-* Select all displays and click Open.
-
-	This step only needs to be done once for each display.
-
-* Click on File in the menu.
-
-* Click on Open ….
-
-* Double click on pn_market_data_raw_tables.
-
-	This will load the pn_market_data_raw_tables display into the editor. 
-	This display is configured to connect to your local RTView data server and collect data. This process then populates the display with live data that is being collected by the node script from PubNub.
-
+Click on Save Added Servers.
+```
+* Test that the connection is successful:
+```
+Click on the green magnifying glass icon next to the PUBNUB-IOT-SERVER entry.
+This will invoke the RTView DataServer - Cache Tables dialog.
+Verify that you see "Connected" under Connection Status. 
+Verify that you see PubNubMarketData, PubNubWeatherData and PubNubSensorData in the CacheTable.
+Close the dialog.
+```
+* Import the sample displays:
+```
+On the RTView Cloud top menu bar, click on Design to invoke the RTDraw visual editing tool.
+Select the File dropdown menu and click on Import... 
+In the file browser, navigate to the RTView-PubNub-Displays directory within this project.
+Select all displays and click Open.
+```
+* View or edit the sample displays:
+```
+Select the File dropdown menu and click on Open...
+Double click the name of the display you would like to open and view in real-time.
+```
+The sample displays are configured to connect to your local RTView data server and present data changing in real-time.
+You can experiment with the editing features of RTDraw to make changes to these displays or create your own.
 
 ## Achieved Goals
-RTView-PubNub demo should have : 
-* Shown how easy it is to display PubNub topics in graphical and highly configurable displays in the Cloud.
-* Conveyed the structure of the node script, needed to send data to RTView, which subscribes to topics of interest.
-* Allowed the users to enhance the existing RTView displays or create new ones.
+In this RTView-PubNub project you will have achieved the following: 
+* Seen how easy it is to display PubNub topics in graphical and highly configurable displays in the Cloud.
+* Launched the simple node program used to send data to RTView, subscribing to topics of interest.
+* Seen how users are able to view or enhance the sample RTView displays or create new displays.
 
-**_Feel free to experiment with this project, modify it, enhance it and share your experience, comments, suggestions and/or enhancements with us._**
+**Feel free to experiment with, modify or enhance this project, and share your experience, comments and suggestions with us. Please fork this repo and submit a pull request for any changes you would like to suggest.**
 
